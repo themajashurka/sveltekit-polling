@@ -39,4 +39,7 @@ test('all counts to be 1', async ({ page }) => {
 	await incrementRootCount.click();
 	await expect(dataRootCount).toHaveText('3');
 	await expect(polledDataRootCount).toHaveText('3');
+	await sleep(1000);
+	await expect(dataRootCount).toHaveText('3');
+	await expect(polledDataRootCount).toHaveText('4');
 });
