@@ -2,6 +2,7 @@ import { get, writable, type Writable } from 'svelte/store';
 import type { page } from '$app/stores';
 import equal from 'fast-deep-equal';
 import * as devalue from 'devalue';
+import { dev } from '$app/environment';
 
 export const pollingResponse = (body: any) => new Response(devalue.uneval(body));
 
@@ -17,9 +18,10 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 	private keys: PageDataKey[];
 	private interval: number;
 	private get oldData() {
-		return this.extractObject(get(this.polledData));
+		return this.extractObject(get(this.polledData), this.keys);
 	}
 	private noWaitForResponse: boolean;
+	private currentPageData!: PageData;
 
 	private updatePolledData = (x: PageData, newData: PageData) => {
 		for (const key of this.keys) {
@@ -27,10 +29,10 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		}
 		return x;
 	};
-	private extractObject = (obj: any) => {
-		const newObj = {} as PageData;
-		for (const key of this.keys) {
-			newObj[key] = obj[key];
+	private extractObject = <T extends {}>(obj: T, keys: (keyof T)[]) => {
+		const newObj = {} as T;
+		for (const key of keys) {
+			newObj[key as keyof T] = obj[key];
 		}
 		return newObj;
 	};
@@ -49,15 +51,32 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		this.keys = Array.isArray(args.keys) ? args.keys : [args.keys];
 		this.noWaitForResponse = args.noWaitForResponse ?? false;
 
-		this.polledData = writable(this.extractObject(args.data));
-		let currentPageData = this.extractObject(args.data);
+		const allPageDataKeys = Object.keys(args.data);
+		if (dev) console.log('all page data keys', allPageDataKeys);
 
+		this.polledData = writable(args.data);
+		if (dev) console.log('default page data', devalue.uneval(this.oldData));
+
+		this.currentPageData = deepCopy(args.data);
 		this.pageUnsub = this.page.subscribe((x) => {
-			const newData = this.extractObject(x.data);
-			if (!equal(currentPageData, newData)) {
-				currentPageData = newData;
+			const newData = this.extractObject(x.data, allPageDataKeys) as PageData;
+			if (dev)
+				console.log(
+					'page changed',
+					'oldData',
+					devalue.uneval(this.currentPageData),
+					'newData',
+					devalue.uneval(newData)
+				);
+			if (!equal(this.currentPageData, newData)) {
+				if (dev)
+					console.log(
+						'page data changed',
+						devalue.uneval(this.currentPageData),
+						devalue.uneval(newData)
+					);
+				this.currentPageData = newData;
 				this.polledData.update((x) => this.updatePolledData(x, newData));
-				console.log('page data changed');
 			}
 		});
 	}
@@ -66,23 +85,29 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		if (!this.polling) return;
 		this.timeout = setTimeout(
 			async () => {
-				const promise = new Promise(async (res) => {
+				const pollingPromise = new Promise(async (res) => {
 					try {
 						const newData = (await fetch(this.routeId + '?__polling__=true', { method: 'get' })
 							.then(async (x) => x.text())
 							.then((x) => eval('(' + x + ')'))) as PageData;
-						console.log('polled data', newData);
+						if (dev) console.log('polled data', newData);
 						if (!equal(this.oldData, newData)) {
+							if (dev)
+								console.log(
+									'page data changed during polling',
+									devalue.uneval(this.oldData),
+									devalue.uneval(newData)
+								);
 							this.polledData.update((x) => this.updatePolledData(x, newData));
-							console.log('page data changed during polling');
 						}
-						res('');
 					} catch (e) {
 						console.error(e);
+					} finally {
+						res('');
 					}
 				});
 
-				if (!this.noWaitForResponse) await promise;
+				if (!this.noWaitForResponse) await pollingPromise;
 
 				this.poll();
 			},
@@ -113,3 +138,5 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		this.poll(true);
 	};
 }
+
+const deepCopy = <T>(data: T) => eval('(' + devalue.uneval(data) + ')') as T;
