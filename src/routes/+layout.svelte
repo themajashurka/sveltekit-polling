@@ -4,7 +4,6 @@
 	import { Polling } from '$lib/Polling.js';
 	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
 
 	export let data: LayoutData;
 	const polling = new Polling({ data, interval: 1000, keys: 'layoutCount', page, routeId: '/' });
@@ -22,5 +21,7 @@
 
 <p>layout count {data.layoutCount}</p>
 <p>layout polled count {$polledData.layoutCount}</p>
+<p>layout other count {data.layoutOtherCount}</p>
+<p>layout other count (from polledData) {$polledData.layoutOtherCount}</p>
 
 <slot />

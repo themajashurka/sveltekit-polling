@@ -23,18 +23,12 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 	private noWaitForResponse: boolean;
 	private currentPageData!: PageData;
 
-	private updatePolledData = (x: PageData, newData: PageData) => {
-		for (const key of this.keys) {
-			x[key] = newData[key];
-		}
-		return x;
-	};
-	private extractObject = <T extends {}>(obj: T, keys: (keyof T)[]) => {
-		const newObj = {} as T;
+	private extractObject = <T extends {}>(source: T, keys: (keyof T)[], target?: T) => {
+		const _target = target ?? ({} as T);
 		for (const key of keys) {
-			newObj[key as keyof T] = obj[key];
+			_target[key as keyof T] = source[key];
 		}
-		return newObj;
+		return _target;
 	};
 
 	constructor(args: {
@@ -57,7 +51,7 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		this.polledData = writable(args.data);
 		if (dev) console.log('default page data', devalue.uneval(this.oldData));
 
-		this.currentPageData = deepCopy(args.data);
+		this.currentPageData = this.extractObject(args.data, allPageDataKeys);
 		this.pageUnsub = this.page.subscribe((x) => {
 			const newData = this.extractObject(x.data, allPageDataKeys) as PageData;
 			if (dev)
@@ -76,12 +70,12 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 						devalue.uneval(newData)
 					);
 				this.currentPageData = newData;
-				this.polledData.update((x) => this.updatePolledData(x, newData));
+				this.polledData.update((x) => this.extractObject(newData, allPageDataKeys, x));
 			}
 		});
 	}
 
-	poll = async (immediate?: true) => {
+	private poll = async (immediate?: true) => {
 		if (!this.polling) return;
 		this.timeout = setTimeout(
 			async () => {
@@ -98,7 +92,7 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 									devalue.uneval(this.oldData),
 									devalue.uneval(newData)
 								);
-							this.polledData.update((x) => this.updatePolledData(x, newData));
+							this.polledData.update((x) => this.extractObject(newData, this.keys, x));
 						}
 					} catch (e) {
 						console.error(e);
