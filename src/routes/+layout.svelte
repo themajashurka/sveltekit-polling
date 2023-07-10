@@ -1,27 +1,10 @@
 <script lang="ts">
-	import type { LayoutData } from './$types.js';
-	import { page } from '$app/stores';
-	import { Polling } from '$lib/Polling.js';
-	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
+	import type { LayoutServerData } from './$types.js';
 
-	export let data: LayoutData;
-	const polling = new Polling({ data, interval: 1000, keys: 'layoutCount', page, routeId: '/' });
-	const polledData = polling.polledData;
-
-	onMount(() => {
-		polling.begin();
-		return () => polling.stop();
-	});
+	export let data: LayoutServerData;
 </script>
 
-<form method="post" use:enhance>
-	<button>increment layout count</button>
-</form>
-
-<p>layout count {data.layoutCount}</p>
-<p>layout polled count {$polledData.layoutCount}</p>
-<p>layout other count {data.layoutOtherCount}</p>
-<p>layout other count (from polledData) {$polledData.layoutOtherCount}</p>
+<p>data.layoutCount</p>
+<p data-testid="dataLayoutCount">{data.layoutCount}</p>
 
 <slot />

@@ -5,4 +5,4 @@
 
 <p>foo count: {data.fooCount}</p>
 
-<a href="/">goto layout</a>
+<a data-testid="gotoLayout" href="/">goto layout</a>

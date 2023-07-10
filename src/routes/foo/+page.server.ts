@@ -8,7 +8,11 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: () => {
+	_default: () => {
+		return { ok: true };
+	},
+	reset: async () => {
+		count = 0;
 		return { ok: true };
 	}
 };

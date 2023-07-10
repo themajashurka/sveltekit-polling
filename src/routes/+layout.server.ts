@@ -1,10 +1,13 @@
 import type { LayoutServerLoad } from './$types.js';
 
 let count = 0;
-let otherCount = 1;
-export const load: LayoutServerLoad = async () => {
+export const load: LayoutServerLoad = async ({ cookies }) => {
 	console.log('layout load runs');
+	const reset = cookies.get('reset') !== undefined;
+	if (reset) {
+		count = 0;
+	}
+
 	count++;
-	otherCount *= 2;
-	return { layoutCount: count, layoutOtherCount: otherCount };
+	return { layoutCount: count };
 };
