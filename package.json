@@ -1,7 +1,7 @@
 {
 	"name": "sveltekit-polling",
 	"license": "MIT",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -28,7 +28,8 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^3.0.0"
+		"svelte": "^3.0.0",
+		"@sveltejs/kit": "^1.0.0"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.28.1",
