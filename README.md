@@ -12,11 +12,11 @@ setInterval(() => {
 }, 1000);
 ```
 
-However, sveltekit has its own logic about when a load function needs to be invoked, and in certain scenarios calling `invalidate` causes dependecy tracking to kick in, so you could end up rerunning more load functions than you ultimately want.
+However, sveltekit has its own logic about load function invocation, and in certain scenarios calling `invalidate` causes dependency tracking to kick in, so you could end up rerunning more load functions than you ultimately want.
 
 Invalidating a whole page could cause unnecessary strain on the server by recalculating unchanging properties. Maybe you don't need to invalidate all properties returned by a load function, just a portion of it.
 
-Taking advantage of the independency of `+server` endpoints, polling can be done with them easily.
+Taking advantage of the independency of `+server` endpoints, granular polling can be done with them easily.
 
 # Usage
 
@@ -25,7 +25,6 @@ Populate your page with a `load` function
 ```js
 export const load = async () => {
 	const dbResult = await db.get('count');
-
 	return { staticProperty: 'foo', dynamicCount: dbResult };
 };
 ```
@@ -40,7 +39,6 @@ import { beingPolled, pollingResponse } from 'sveltekit-polling';
 export const GET = async ({ url }) => {
 	if (beingPolled(url)) {
 		const dbResult = await db.get('count');
-
 		return pollingResponse({ dynamicCount: dbResult });
 	}
 
