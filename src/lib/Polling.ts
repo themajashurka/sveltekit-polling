@@ -23,6 +23,8 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 	private noWaitForResponse: boolean;
 	private currentPageData!: PageData;
 
+	private onPolled: (() => any) | undefined;
+
 	private extractObject = <T extends {}>(source: T, keys: (keyof T)[], target?: T) => {
 		const _target = target ?? ({} as T);
 		for (const key of keys) {
@@ -38,6 +40,7 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		keys: PageDataKey[] | PageDataKey;
 		routeId?: string;
 		noWaitForResponse?: true;
+		onPolled?: () => any;
 	}) {
 		this.routeId = args.routeId ?? get(args.page).route.id!;
 		this.interval = args.interval;
@@ -73,10 +76,12 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 				this.polledData.update((x) => this.extractObject(newData, allPageDataKeys, x));
 			}
 		});
+
+		this.onPolled = args.onPolled;
 	}
 
-	private poll = async (immediate?: true) => {
-		if (!this.polling) return;
+	private poll = async (immediate?: true, once?: boolean) => {
+		if (!this.polling) return Promise.resolve();
 		this.timeout = setTimeout(
 			async () => {
 				const pollingPromise = new Promise(async (res) => {
@@ -102,8 +107,8 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 				});
 
 				if (!this.noWaitForResponse) await pollingPromise;
-
-				this.poll();
+				if (typeof this.onPolled !== 'undefined') this.onPolled();
+				if (!once) this.poll();
 			},
 			immediate ? 0 : this.interval
 		);

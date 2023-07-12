@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	if (beingPolled(url)) {
 		count++;
-		return pollingResponse({ rootCount: count });
+		return pollingResponse({ rootCount: count, layoutCount: count + 1 });
 	}
 
 	return new Response();
