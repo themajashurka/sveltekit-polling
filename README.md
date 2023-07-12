@@ -75,6 +75,6 @@ Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling
 <p>{$polledData.staticProperty}</p><p>{$polledData.dynamicCount}</p>
 ```
 
-`pollingData` is a store with all keys from your initial `data`. Every time `data` changes (after a form submission for example) or a polling is done, `polledData` updates.
+`polledData` is a store with all keys from your initial `data`. Every time `data` changes (after a form submission for example) or a polling is done, `polledData` updates.
 
 > TODO: `new Polling()` constructor argument docs, type safety across `+page` and `+server` and client.
