@@ -51,7 +51,7 @@ export const GET = async ({ url }) => {
 Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling. Specify your polled keys, and your `+server` location.
 
 ```svelte
-<script lang="ts">
+<script>
 	import { Polling } from 'sveltekit-polling';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
@@ -68,7 +68,7 @@ Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling
 
 	onMount(() => {
 		polling.begin();
-		return polling.stop();
+		return () => polling.stop();
 	});
 </script>
 
