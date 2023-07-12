@@ -1,11 +1,15 @@
 {
 	"name": "sveltekit-polling",
 	"license": "MIT",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/themajashurka/sveltekit-polling.git"
 	},
+	"keywords": [
+		"sveltekit",
+		"polling"
+	  ],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
