@@ -2,7 +2,7 @@
 
 One way to achive realtime capabilities in an app is polling.
 
-In sveltekit, this could be solved from client side with a simple periodic calling of `invalidate(...)` or `invalidateAll()`
+In Sveltekit, this could be solved from client side with a simple periodic calling of `invalidate(...)` or `invalidateAll()`
 
 ```js
 setInterval(() => {
@@ -12,9 +12,9 @@ setInterval(() => {
 }, 1000);
 ```
 
-However, sveltekit has its own logic about load function invocation, and in certain scenarios calling `invalidate` causes dependency tracking to kick in, so you could end up rerunning more load functions than you ultimately want.
+However, Sveltekit has its own logic about load function invocation, and in certain scenarios calling `invalidate` causes dependency tracking to kick in, so you could end up rerunning more load functions than you ultimately want.
 
-Invalidating a whole page could cause unnecessary strain on the server by recalculating unchanging properties. Maybe you don't need to invalidate all properties returned by a load function, just a portion of it.
+Invalidating a whole page could cause unnecessary strain on the server by overfetching unchanging properties. Maybe you don't need to invalidate all properties returned by a load function, just a portion of it.
 
 Taking advantage of the independency of `+server` endpoints, granular polling can be done with them easily.
 
