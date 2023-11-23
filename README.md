@@ -65,19 +65,21 @@ Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling
 	});
 	const polledData = polling.polledData;
 
-	//add this to onMount
 	onMount(polling.onMount);
-
-	//OR, if you need more control in OnMount
-	onMount(() => {
-		polling.begin();
-		return () => polling.stop();
-	});
 </script>
 
 <p>{$polledData.staticProperty}</p><p>{$polledData.dynamicCount}</p>
 ```
 
 `polledData` is a store with all keys from your initial `data`. Every time `data` changes (after a form submission for example) or a polling is done, `polledData` updates.
+
+> Note: If you need more control in `onMount()`, you can control `polling` with fine grained control:
+
+```svelte
+onMount(() => {
+	polling.begin();
+	return () => polling.stop();
+});
+```
 
 > TODO: `new Polling()` constructor argument docs, type safety across `+page` and `+server` and client.
