@@ -9,7 +9,7 @@
 	"keywords": [
 		"sveltekit",
 		"polling"
-	  ],
+	],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -36,7 +36,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^3.0.0",
+		"svelte": ">3",
 		"@sveltejs/kit": "^1.0.0"
 	},
 	"devDependencies": {

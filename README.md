@@ -55,6 +55,7 @@ Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling
 	import { onMount } from 'svelte';
 
 	export let data;
+
 	const polling = new Polling({
 		page,
 		data,
@@ -64,6 +65,10 @@ Use `new Polling(args)` in a `+page` and call `polling.begin()` to begin polling
 	});
 	const polledData = polling.polledData;
 
+	//add this to onMount
+	onMount(polling.onMount);
+
+	//OR, if you need more control in OnMount
 	onMount(() => {
 		polling.begin();
 		return () => polling.stop();

@@ -49,17 +49,17 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		this.noWaitForResponse = args.noWaitForResponse ?? false;
 
 		const allPageDataKeys = Object.keys(args.data);
-		if (dev) console.log('all page data keys', allPageDataKeys);
+		if (dev) console.log('sveltekit-polling -> all page data keys', allPageDataKeys);
 
 		this.polledData = writable(args.data);
-		if (dev) console.log('default page data', devalue.uneval(this.oldData));
+		if (dev) console.log('sveltekit-polling -> default page data', devalue.uneval(this.oldData));
 
 		this.currentPageData = this.extractObject(args.data, allPageDataKeys);
 		this.pageUnsub = this.page.subscribe((x) => {
 			const newData = this.extractObject(x.data, allPageDataKeys) as PageData;
 			if (dev)
 				console.log(
-					'page changed',
+					'sveltekit-polling -> page changed',
 					'oldData',
 					devalue.uneval(this.currentPageData),
 					'newData',
@@ -68,7 +68,7 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 			if (!equal(this.currentPageData, newData)) {
 				if (dev)
 					console.log(
-						'page data changed',
+						'sveltekit-polling -> page data changed',
 						devalue.uneval(this.currentPageData),
 						devalue.uneval(newData)
 					);
@@ -89,11 +89,11 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 						const newData = (await fetch(this.routeId + '?__polling__=true', { method: 'get' })
 							.then(async (x) => x.text())
 							.then((x) => eval('(' + x + ')'))) as PageData;
-						if (dev) console.log('polled data', newData);
+						if (dev) console.log('sveltekit-polling -> polled data', newData);
 						if (!equal(this.oldData, newData)) {
 							if (dev)
 								console.log(
-									'page data changed during polling',
+									'sveltekit-polling -> page data changed during polling',
 									devalue.uneval(this.oldData),
 									devalue.uneval(newData)
 								);
@@ -135,6 +135,11 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 		if (this.polling) return;
 		this.polling = true;
 		this.poll(true);
+	};
+
+	onMount = () => {
+		this.begin();
+		return this.stop;
 	};
 }
 
