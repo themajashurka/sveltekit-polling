@@ -61,16 +61,16 @@ export class Polling<PageData extends { [key: string]: any }, PageDataKey extend
 				console.log(
 					'sveltekit-polling -> page changed',
 					'oldData',
-					devalue.uneval(this.currentPageData),
+					this.currentPageData,
 					'newData',
-					devalue.uneval(newData)
+					newData
 				);
 			if (!equal(this.currentPageData, newData)) {
 				if (dev)
 					console.log(
 						'sveltekit-polling -> page data changed',
-						devalue.uneval(this.currentPageData),
-						devalue.uneval(newData)
+						this.currentPageData,
+						newData
 					);
 				this.currentPageData = newData;
 				this.polledData.update((x) => this.extractObject(newData, allPageDataKeys, x));
